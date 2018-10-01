@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+ db:
+  container_name: jeedom_mariadb
+  image: mariadb
+  volumes:
+   - /data/jeedom/db:/var/lib/mysql
+  environment:
+   - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+   - MYSQL_USER=${MYSQL_USER}
+   - MYSQL_DATABASE=${MYSQL_DATABASE}
+   - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+   - TZ=Europe/Paris
+  restart: always
+
+ web:
+  container_name: jeedom_server
+  ports:
+    - "8080:80"
+    - "8022:22"
+    - "8083:8083"
+  image: jeedom/jeedom
+  environment:
+    - ROOT_PASSWORD=${ROOT_PASSWORD}
+    - TZ=Europe/Paris
+  privileged: true
+  volumes:
+    - ${JEEDOM_DATA_PATH}
+  links:
+    - db:db
+  devices:
+    - "/dev/ttyACM0:/dev/ttyACM0"
+
+  restart: always
